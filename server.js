@@ -15,7 +15,8 @@ const app = express();
 
 // Standard middleware
 app.use(cors({
-  origin: ["http://localhost:5173","https://iqra-amdara.netlify.app", "http://localhost:5174"],
+  origin: '*',
+  // origin: ["http://localhost:5173","https://iqra-amdara.netlify.app", "http://localhost:5174"],
   credentials: true,
 }));
 app.use(express.json());
