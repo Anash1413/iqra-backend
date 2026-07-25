@@ -15,7 +15,7 @@ const app = express();
 
 // Standard middleware
 app.use(cors({
-  origin: ["http://localhost:5173", "http://localhost:5174"],
+  origin: ["http://localhost:5173","https://iqra-amdara.netlify.app", "http://localhost:5174"],
   credentials: true,
 }));
 app.use(express.json());
@@ -45,7 +45,7 @@ app.use((err, req, res, next) => {
     message: err.message || 'An internal server error occurred.'
   });
 });
-
+   
 // Start Server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

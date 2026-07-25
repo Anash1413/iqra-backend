@@ -1,28 +1,21 @@
 const mongoose = require('mongoose');
-const User = require('../models/User');
+const dns = require('node:dns');
+
+// Force custom public DNS servers to resolve MongoDB Atlas SRV lookup errors (querySrv ECONNREFUSED)
+try {
+  dns.setServers(['8.8.8.8', '1.1.1.1']);
+} catch (e) {
+  console.warn('Could not set custom DNS servers:', e.message);
+}
 
 const connectDB = async () => {
   try {
-    const conn = await mongoose.connect(process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/iqra_db');
-    console.log(`MongoDB Connected: ${conn.connection.host}`);
-
-    // Ensure the default Super Admin exists with the correct password
-    let superAdmin = await User.findOne({ email: 'superadmin@iqra.org' });
-    if (!superAdmin) {
-      await User.create({
-        name: 'Demo Super Admin',
-        email: 'superadmin@iqra.org',
-        password: 'superadmin123',
-        role: 'superadmin'
-      });
-      console.log('Created Default Super Admin account: superadmin@iqra.org / superadmin123');
-    } else {
-      // Force reset its password to superadmin123 to resolve login blockages
-      superAdmin.password = 'superadmin123';
-      superAdmin.name = 'Demo Super Admin';
-      await superAdmin.save();
-      console.log('Reset Default Super Admin password: superadmin@iqra.org / superadmin123');
+    const primaryUri = process.env.MONGODB_URI;
+    if (!primaryUri) {
+      throw new Error('MONGODB_URI environment variable is missing from system environment config.');
     }
+    const conn = await mongoose.connect(primaryUri);
+    console.log(`MongoDB Connected: ${conn.connection.host}`);
   } catch (error) {
     console.error(`MongoDB Connection Error: ${error.message}`);
     process.exit(1);
