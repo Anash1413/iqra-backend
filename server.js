@@ -7,6 +7,7 @@ const connectDB = require('./config/db');
 const authRoutes = require('./routes/authRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const studentRoutes = require('./routes/studentRoutes');
+const certificateRoutes = require('./routes/certificateRoutes');
 
 // Connect to Database
 connectDB();
@@ -15,12 +16,11 @@ const app = express();
 
 // Standard middleware
 app.use(cors({
-  
-   origin: ["http://localhost:5173","https://iqra-amdara.netlify.app", "http://localhost:5174"],
+  origin: ["http://localhost:5173", "https://iqra-amdara.netlify.app", "http://localhost:5174"],
   credentials: true,
 }));
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: '10mb' })); // Increase payload limit to allow background base64 image transfers
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // Simple health-check endpoint
 app.get('/api/health', (req, res) => {
@@ -31,6 +31,7 @@ app.get('/api/health', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/students', studentRoutes);
+app.use('/api/certificates', certificateRoutes);
 
 // Global Error Handler Middleware
 app.use((err, req, res, next) => {

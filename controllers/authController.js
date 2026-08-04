@@ -28,7 +28,7 @@ const registerAdmin = async (req, res) => {
 
     // Check if this is the first user in the database
     const userCount = await User.countDocuments();
-    let role = 'admin';
+    let role = 'user';
 
     if (userCount === 0) {
       // First user becomes superadmin

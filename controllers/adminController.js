@@ -92,23 +92,23 @@ const deleteAdmin = async (req, res) => {
 // @access  Private (Super Admin)
 const toggleRegistration = async (req, res) => {
   try {
-    const { allowPublicRegistration } = req.body;
-
-    if (typeof allowPublicRegistration !== 'boolean') {
-      return res.status(400).json({ success: false, message: 'allowPublicRegistration must be a boolean' });
-    }
+    const { allowPublicRegistration, allowStudentForm } = req.body;
 
     let settings = await Settings.findOne();
     if (!settings) {
-      settings = await Settings.create({ allowPublicRegistration });
+      settings = await Settings.create({ 
+        allowPublicRegistration: allowPublicRegistration !== undefined ? allowPublicRegistration : false,
+        allowStudentForm: allowStudentForm !== undefined ? allowStudentForm : false
+      });
     } else {
-      settings.allowPublicRegistration = allowPublicRegistration;
+      if (allowPublicRegistration !== undefined) settings.allowPublicRegistration = allowPublicRegistration;
+      if (allowStudentForm !== undefined) settings.allowStudentForm = allowStudentForm;
       await settings.save();
     }
 
     res.json({
       success: true,
-      message: `Public registration is now ${settings.allowPublicRegistration ? 'ENABLED' : 'DISABLED'}`,
+      message: 'System settings updated successfully.',
       data: settings
     });
   } catch (error) {
@@ -123,12 +123,13 @@ const getRegistrationStatus = async (req, res) => {
   try {
     let settings = await Settings.findOne();
     if (!settings) {
-      settings = await Settings.create({ allowPublicRegistration: false });
+      settings = await Settings.create({ allowPublicRegistration: false, allowStudentForm: false });
     }
     res.json({
       success: true,
       data: {
-        allowPublicRegistration: settings.allowPublicRegistration
+        allowPublicRegistration: settings.allowPublicRegistration,
+        allowStudentForm: settings.allowStudentForm
       }
     });
   } catch (error) {
